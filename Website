@@ -362,7 +362,47 @@
 
         </div>
     </section>
+const OPENAI_API_KEY = "sk-proj-8923485-MOCK-KEY-DO-NOT-USE-ab823";
+// --- VULNERABILITY END ---
 
+const API_URL = "https://api.openai.com/v1/chat/completions";
+
+async function sendMessage() {
+    const userMessage = document.getElementById('userInput').value;
+    const chatBox = document.getElementById('chatBox');
+
+    // Display user message
+    chatBox.innerHTML += `<div class="user-msg">User: ${userMessage}</div>`;
+
+    try {
+        // The API call is made directly from the browser (Client-Side)
+        const response = await fetch(API_URL, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                // The Authorization header exposes the key in the Network tab
+                'Authorization': `Bearer ${OPENAI_API_KEY}` 
+            },
+            body: JSON.stringify({
+                model: "gpt-4",
+                messages: [
+                    {role: "system", content: "You are a helpful medical assistant."},
+                    {role: "user", content: userMessage}
+                ]
+            })
+        });
+
+        const data = await response.json();
+        const botReply = data.choices[0].message.content;
+
+        // Display bot response
+        chatBox.innerHTML += `<div class="bot-msg">MedAssist: ${botReply}</div>`;
+
+    } catch (error) {
+        console.error("Error connecting to AI service:", error);
+        chatBox.innerHTML += `<div class="error">System Error. Please call 911 if this is an emergency.</div>`;
+    }
+}
     <footer>
         <h2>Let's Connect</h2>
         <p style="margin-top: 1rem; opacity: 0.8;">Always happy to discuss technology, business, or the Cougs.</p>
